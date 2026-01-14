@@ -6,9 +6,18 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   grade:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     
     steps:
       - name: Checkout code
@@ -172,49 +181,38 @@ jobs:
           fi
           echo "badge=$badge" >> $GITHUB_OUTPUT
 
-      - name: Post score comment
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const score = ${{ steps.calculate.outputs.score }};
-            const badge = "${{ steps.calculate.outputs.badge }}";
-            
-            const breakdown = `
-            ## ${badge} Score: ${score}/110 points
-            
-            ### Detailed Breakdown:
-            
-            | Criteria | Points | Status |
-            |----------|--------|--------|
-            | Personal Answers | ${{ steps.check_answers.outputs.points }}/10 | ${{ steps.check_answers.outputs.points == 10 && '✅' || '❌' }} |
-            | Tests Exist | ${{ steps.check_tests.outputs.points }}/10 | ${{ steps.check_tests.outputs.points == 10 && '✅' || '❌' }} |
-            | TDD Bonus (Tests First) | ${{ steps.check_tdd.outputs.points }}/20 | ${{ steps.check_tdd.outputs.points == 20 && '✅' || steps.check_tdd.outputs.points > 0 && 'ℹ️' || '—' }} |
-            | Component Renders | ${{ steps.check_component.outputs.points }}/15 | ${{ steps.check_component.outputs.points == 15 && '✅' || steps.check_component.outputs.points > 0 && '⚠️' || '❌' }} |
-            | Countdown Logic | ${{ steps.run_tests.outputs.points }}/20 | ${{ steps.run_tests.outputs.points == 20 && '✅' || steps.run_tests.outputs.points > 0 && '⚠️' || '❌' }} |
-            | Audio Alert | ${{ steps.check_audio.outputs.points }}/15 | ${{ steps.check_audio.outputs.points == 15 && '✅' || '❌' }} |
-            | Good Judgment | ${{ steps.check_judgment.outputs.points }}/10 | ${{ steps.check_judgment.outputs.points == 10 && '✅' || '❌' }} |
-            
-            ### What This Means:
-            ${score >= 90 ? '🎉 **Outstanding work!** You\'re very likely to advance to interviews.' :
-              score >= 70 ? '👍 **Solid submission!** You\'ll definitely be considered.' :
-              score >= 50 ? '✓ **You passed the basics.** May be considered based on other factors.' :
-              '⚠️ **More work needed.** Focus on completing the core requirements.'}
-            
-            ### Next Steps:
-            - You can keep improving your score until the deadline
-            - Every push triggers a new grading run
-            - Dan will review top scorers manually
-            
-            *This is an automated score. The test will officially close on Day 8.*
-            `;
-            
-            // Comment on commit
-            github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-              body: breakdown
-            });
+      - name: Create score summary
+        id: summary
+        run: |
+          score=${{ steps.calculate.outputs.score }}
+          badge="${{ steps.calculate.outputs.badge }}"
+          
+          # Create summary file
+          cat > score_summary.txt << 'EOF'
+          ## ${badge} Score: ${score}/110 points
+          
+          ### Detailed Breakdown:
+          
+          | Criteria | Points | Status |
+          |----------|--------|--------|
+          | Personal Answers | ${{ steps.check_answers.outputs.points }}/10 | ${{ steps.check_answers.outputs.points == 10 && '✅' || '❌' }} |
+          | Tests Exist | ${{ steps.check_tests.outputs.points }}/10 | ${{ steps.check_tests.outputs.points == 10 && '✅' || '❌' }} |
+          | TDD Bonus (Tests First) | ${{ steps.check_tdd.outputs.points }}/20 | ${{ steps.check_tdd.outputs.points == 20 && '✅' || steps.check_tdd.outputs.points > 0 && 'ℹ️' || '—' }} |
+          | Component Renders | ${{ steps.check_component.outputs.points }}/15 | ${{ steps.check_component.outputs.points == 15 && '✅' || steps.check_component.outputs.points > 0 && '⚠️' || '❌' }} |
+          | Countdown Logic | ${{ steps.run_tests.outputs.points }}/20 | ${{ steps.run_tests.outputs.points == 20 && '✅' || steps.run_tests.outputs.points > 0 && '⚠️' || '❌' }} |
+          | Audio Alert | ${{ steps.check_audio.outputs.points }}/15 | ${{ steps.check_audio.outputs.points == 15 && '✅' || '❌' }} |
+          | Good Judgment | ${{ steps.check_judgment.outputs.points }}/10 | ${{ steps.check_judgment.outputs.points == 10 && '✅' || '❌' }} |
+          
+          ### Next Steps:
+          - You can keep improving your score until the deadline
+          - Every push triggers a new grading run
+          - Dan will review top scorers manually
+          
+          *This is an automated score. Check the Actions tab for details.*
+          EOF
+          
+          cat score_summary.txt >> $GITHUB_STEP_SUMMARY
+          echo "Score summary created and added to workflow summary"
 
       - name: Fail if score too low (optional warning)
         if: steps.calculate.outputs.score < 30

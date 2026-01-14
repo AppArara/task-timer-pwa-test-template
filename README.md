@@ -17,6 +17,32 @@ Welcome! You've been invited to complete a coding test for a part-time junior de
 
 ---
 
+## 🔔 What to Expect When You First Open Your Repository
+
+**You'll see some automatic commits from GitHub Classroom - this is normal!**
+
+- "Initial commit" - Your starter code
+- "add online IDE url; add deadline" - Classroom metadata (you can ignore)
+- "GitHub Classroom Feedback" - Creates feedback system for code review
+
+**You'll also see warnings:**
+
+1. **"Your main branch isn't protected"** - Click "Dismiss". You NEED to push to main for this test.
+2. **"This branch is 3 commits ahead"** - This is normal. GitHub Classroom added those commits automatically.
+
+**How to see your auto-grading score:**
+
+Every time you push code:
+1. Go to the **"Actions"** tab at the top of this page
+2. Click on the latest workflow run ("Auto Grade Submission")
+3. Wait 2-3 minutes for it to complete (green checkmark ✓ = done, red X = errors)
+4. Click on the workflow run name to see details
+5. **Scroll down to the bottom** - you'll see your score breakdown in the "Summary" section
+
+**Pro tip:** The score appears at the bottom of the workflow page - don't miss it!
+
+---
+
 ## What This Is
 
 Task Timer PWA is a simple productivity app created by Dan Donahue as a quick coding experiment. It helps people track tasks and stay focused. Your job is to add a new "Focus Timer" feature following the production manual.
