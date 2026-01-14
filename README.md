@@ -2,6 +2,21 @@
 
 Welcome! You've been invited to complete a coding test for a part-time junior developer position.
 
+## ⚠️ IMPORTANT: First-Time GitHub Classroom Users
+
+**If you're seeing a "Repository Access Issue" error:**
+
+1. **Check your email inbox** - GitHub Classroom sent you an invitation email
+2. **Check spam/trash folders** if you don't see it
+3. **Click the "View Invitation" button** in the email
+4. **Click "Accept this assignment"** on the GitHub Classroom page
+5. **Wait 10-30 seconds** for your personal repository to be created
+6. **Refresh this page** - you should now see the files below
+
+**Still having issues?** Email Dan with a screenshot of the error.
+
+---
+
 ## What This Is
 
 Task Timer PWA is a simple productivity app created by Dan Donahue as a quick coding experiment. It helps people track tasks and stay focused. Your job is to add a new "Focus Timer" feature following the production manual.
