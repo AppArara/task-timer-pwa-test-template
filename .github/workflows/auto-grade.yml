@@ -187,32 +187,36 @@ jobs:
           score=${{ steps.calculate.outputs.score }}
           badge="${{ steps.calculate.outputs.badge }}"
           
-          # Create summary file
-          cat > score_summary.txt << 'EOF'
-          ## ${badge} Score: ${score}/110 points
+          # Determine status icons
+          answers_status="${{ steps.check_answers.outputs.points == '10' && '✅' || '❌' }}"
+          tests_status="${{ steps.check_tests.outputs.points == '10' && '✅' || '❌' }}"
+          tdd_status="${{ steps.check_tdd.outputs.points == '20' && '✅' || steps.check_tdd.outputs.points == '0' && '—' || '⚠️' }}"
+          component_status="${{ steps.check_component.outputs.points == '15' && '✅' || steps.check_component.outputs.points == '0' && '❌' || '⚠️' }}"
+          countdown_status="${{ steps.run_tests.outputs.points == '20' && '✅' || steps.run_tests.outputs.points == '0' && '❌' || '⚠️' }}"
+          audio_status="${{ steps.check_audio.outputs.points == '15' && '✅' || '❌' }}"
+          judgment_status="${{ steps.check_judgment.outputs.points == '10' && '✅' || '❌' }}"
           
-          ### Detailed Breakdown:
-          
-          | Criteria | Points | Status |
-          |----------|--------|--------|
-          | Personal Answers | ${{ steps.check_answers.outputs.points }}/10 | ${{ steps.check_answers.outputs.points == 10 && '✅' || '❌' }} |
-          | Tests Exist | ${{ steps.check_tests.outputs.points }}/10 | ${{ steps.check_tests.outputs.points == 10 && '✅' || '❌' }} |
-          | TDD Bonus (Tests First) | ${{ steps.check_tdd.outputs.points }}/20 | ${{ steps.check_tdd.outputs.points == 20 && '✅' || steps.check_tdd.outputs.points > 0 && 'ℹ️' || '—' }} |
-          | Component Renders | ${{ steps.check_component.outputs.points }}/15 | ${{ steps.check_component.outputs.points == 15 && '✅' || steps.check_component.outputs.points > 0 && '⚠️' || '❌' }} |
-          | Countdown Logic | ${{ steps.run_tests.outputs.points }}/20 | ${{ steps.run_tests.outputs.points == 20 && '✅' || steps.run_tests.outputs.points > 0 && '⚠️' || '❌' }} |
-          | Audio Alert | ${{ steps.check_audio.outputs.points }}/15 | ${{ steps.check_audio.outputs.points == 15 && '✅' || '❌' }} |
-          | Good Judgment | ${{ steps.check_judgment.outputs.points }}/10 | ${{ steps.check_judgment.outputs.points == 10 && '✅' || '❌' }} |
-          
-          ### Next Steps:
-          - You can keep improving your score until the deadline
-          - Every push triggers a new grading run
-          - Dan will review top scorers manually
-          
-          *This is an automated score. Check the Actions tab for details.*
-          EOF
-          
-          cat score_summary.txt >> $GITHUB_STEP_SUMMARY
-          echo "Score summary created and added to workflow summary"
+          # Write to step summary
+          echo "## ${badge} Score: ${score}/110 points" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Detailed Breakdown:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Criteria | Points | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Personal Answers | ${{ steps.check_answers.outputs.points }}/10 | ${answers_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests Exist | ${{ steps.check_tests.outputs.points }}/10 | ${tests_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TDD Bonus (Tests First) | ${{ steps.check_tdd.outputs.points }}/20 | ${tdd_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Component Renders | ${{ steps.check_component.outputs.points }}/15 | ${component_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Countdown Logic | ${{ steps.run_tests.outputs.points }}/20 | ${countdown_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Audio Alert | ${{ steps.check_audio.outputs.points }}/15 | ${audio_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Good Judgment | ${{ steps.check_judgment.outputs.points }}/10 | ${judgment_status} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "- You can keep improving your score until the deadline" >> $GITHUB_STEP_SUMMARY
+          echo "- Every push triggers a new grading run" >> $GITHUB_STEP_SUMMARY
+          echo "- Dan will review top scorers manually" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*This is an automated score. Check the Actions tab for details.*" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail if score too low (optional warning)
         if: steps.calculate.outputs.score < 30
