@@ -187,14 +187,54 @@ jobs:
           score=${{ steps.calculate.outputs.score }}
           badge="${{ steps.calculate.outputs.badge }}"
           
-          # Determine status icons
-          answers_status="${{ steps.check_answers.outputs.points == '10' && '✅' || '❌' }}"
-          tests_status="${{ steps.check_tests.outputs.points == '10' && '✅' || '❌' }}"
-          tdd_status="${{ steps.check_tdd.outputs.points == '20' && '✅' || steps.check_tdd.outputs.points == '0' && '—' || '⚠️' }}"
-          component_status="${{ steps.check_component.outputs.points == '15' && '✅' || steps.check_component.outputs.points == '0' && '❌' || '⚠️' }}"
-          countdown_status="${{ steps.run_tests.outputs.points == '20' && '✅' || steps.run_tests.outputs.points == '0' && '❌' || '⚠️' }}"
-          audio_status="${{ steps.check_audio.outputs.points == '15' && '✅' || '❌' }}"
-          judgment_status="${{ steps.check_judgment.outputs.points == '10' && '✅' || '❌' }}"
+          # Determine status icons using bash conditionals
+          if [ "${{ steps.check_answers.outputs.points }}" = "10" ]; then
+            answers_status="✅"
+          else
+            answers_status="❌"
+          fi
+          
+          if [ "${{ steps.check_tests.outputs.points }}" = "10" ]; then
+            tests_status="✅"
+          else
+            tests_status="❌"
+          fi
+          
+          if [ "${{ steps.check_tdd.outputs.points }}" = "20" ]; then
+            tdd_status="✅"
+          elif [ "${{ steps.check_tdd.outputs.points }}" = "0" ]; then
+            tdd_status="—"
+          else
+            tdd_status="⚠️"
+          fi
+          
+          if [ "${{ steps.check_component.outputs.points }}" = "15" ]; then
+            component_status="✅"
+          elif [ "${{ steps.check_component.outputs.points }}" = "0" ]; then
+            component_status="❌"
+          else
+            component_status="⚠️"
+          fi
+          
+          if [ "${{ steps.run_tests.outputs.points }}" = "20" ]; then
+            countdown_status="✅"
+          elif [ "${{ steps.run_tests.outputs.points }}" = "0" ]; then
+            countdown_status="❌"
+          else
+            countdown_status="⚠️"
+          fi
+          
+          if [ "${{ steps.check_audio.outputs.points }}" = "15" ]; then
+            audio_status="✅"
+          else
+            audio_status="❌"
+          fi
+          
+          if [ "${{ steps.check_judgment.outputs.points }}" = "10" ]; then
+            judgment_status="✅"
+          else
+            judgment_status="❌"
+          fi
           
           # Write to step summary
           echo "## ${badge} Score: ${score}/110 points" >> $GITHUB_STEP_SUMMARY
