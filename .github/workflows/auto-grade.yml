@@ -261,7 +261,53 @@ jobs:
       - name: Fail if score too low (optional warning)
         if: steps.calculate.outputs.score < 30
         run: |
-          echo "⚠️ WARNING: Score is below 30 points"
-          echo "This likely means major requirements are missing"
-          echo "Review the manual and try again!"
+          echo "❌ SCORE TOO LOW: ${{ steps.calculate.outputs.score }}/110 points (minimum 30 required)"
+          echo ""
+          echo "Your submission is incomplete. Here's what's missing:"
+          echo ""
+          
+          if [ "${{ steps.check_answers.outputs.points }}" = "0" ]; then
+            echo "❌ Personal Answers (0/10 points)"
+            echo "   → CANDIDATE_ANSWERS.md is missing or too short (<100 words)"
+            echo ""
+          fi
+          
+          if [ "${{ steps.check_tests.outputs.points }}" = "0" ]; then
+            echo "❌ Tests Exist (0/10 points)"
+            echo "   → src/components/FocusTimer.test.tsx not found"
+            echo "   → You need to write tests for your component"
+            echo ""
+          fi
+          
+          if [ "${{ steps.check_component.outputs.points }}" = "0" ]; then
+            echo "❌ Component Renders (0/15 points)"
+            echo "   → src/components/FocusTimer.tsx not found or doesn't export properly"
+            echo "   → Create the FocusTimer component and export it"
+            echo ""
+          fi
+          
+          if [ "${{ steps.run_tests.outputs.points }}" = "0" ]; then
+            echo "❌ Countdown Logic (0/20 points)"
+            echo "   → Tests failed or countdown functionality not working"
+            echo "   → Implement the countdown timer logic"
+            echo ""
+          fi
+          
+          if [ "${{ steps.check_audio.outputs.points }}" = "0" ]; then
+            echo "❌ Audio Alert (0/15 points)"
+            echo "   → No audio implementation detected in FocusTimer.tsx"
+            echo "   → Add sound/audio when timer completes"
+            echo ""
+          fi
+          
+          if [ "${{ steps.check_judgment.outputs.points }}" = "0" ]; then
+            echo "❌ Good Judgment (0/10 points)"
+            echo "   → You kept the inappropriate 'Dark One's Blessed Timer' button name"
+            echo "   → Rename it to something professional (e.g., 'Start Timer')"
+            echo ""
+          fi
+          
+          echo "📖 Review the MANUAL.md for detailed instructions"
+          echo "🔄 Push again after fixing the issues above"
+          echo "📊 Check the Summary section below for your current score breakdown"
           exit 1
