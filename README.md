@@ -32,14 +32,51 @@ Welcome! You've been invited to complete a coding test for a part-time junior de
 
 **How to see your auto-grading score:**
 
-Every time you push code:
-1. Go to the **"Actions"** tab at the top of this page
-2. Click on the latest workflow run ("Auto Grade Submission")
-3. Wait 2-3 minutes for it to complete (green checkmark ✓ = done, red X = errors)
-4. Click on the workflow run name to see details
-5. **Scroll down to the bottom** - you'll see your score breakdown in the "Summary" section
+Every time you push code, GitHub Actions automatically grades your submission:
 
-**Pro tip:** The score appears at the bottom of the workflow page - don't miss it!
+1. Go to the **"Actions"** tab at the top of this repository page
+2. You'll see a list of workflow runs - click on the **latest one** (top of the list)
+3. Wait 1-2 minutes for the workflow to complete:
+   - **Green checkmark ✅** = Passed (score ≥ 30 points)
+   - **Red X ❌** = Failed (score < 30 points, or code has errors)
+
+4. **To see your score breakdown:**
+   - Click on the workflow run title to open it
+   - Scroll down to the **"grade summary"** section (about halfway down)
+   - You'll see a table showing your points for each requirement
+   - Example:
+     ```
+     ⚠️ Needs Work Score: 20/110 points
+     
+     | Criteria | Points | Status |
+     | Personal Answers | 10/10 | ✅ |
+     | Tests Exist | 0/10 | ❌ |
+     | Component Renders | 0/15 | ❌ |
+     ```
+
+5. **If your score is below 30 points (workflow fails):**
+   - Click on the red "grade" job in the left sidebar
+   - Expand the **"Fail if score too low"** step at the bottom
+   - You'll see a **detailed explanation** of exactly what's missing:
+     ```
+     ❌ SCORE TOO LOW: 20/110 points (minimum 30 required)
+     
+     Your submission is incomplete. Here's what's missing:
+     
+     ❌ Tests Exist (0/10 points)
+        → src/components/FocusTimer.test.tsx not found
+        → You need to write tests for your component
+     
+     ❌ Component Renders (0/15 points)
+        → src/components/FocusTimer.tsx not found
+        → Create the FocusTimer component and export it
+     ```
+
+**Pro tips:**
+- Push early and often to see your score improve
+- The grader runs on every push - use it to check your progress
+- The score summary shows at the bottom of each workflow run
+- If the workflow fails, read the error message carefully - it tells you exactly what to fix
 
 ---
 
