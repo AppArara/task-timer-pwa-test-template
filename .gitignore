@@ -32,5 +32,10 @@ coverage/
 .env.development.local
 .env.test.local
 
-# Personal/Private files
+# Personal/Private files (not for students)
 Junior_Dev.xlsx
+EMAIL_TEMPLATES.md
+GITHUB_CLASSROOM_SETUP.md
+INVITATION_EMAIL_FINAL.md
+
+# These are prep/admin files - students should NOT see them
