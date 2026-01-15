@@ -2,9 +2,8 @@ name: Deadline Reminders
 
 on:
   schedule:
-    # Run daily at 9 AM UTC (4 AM EST / 1 AM PST)
     - cron: '0 9 * * *'
-  workflow_dispatch:  # Allow manual trigger for testing
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,22 +20,16 @@ jobs:
       - name: Calculate days until deadline
         id: calculate
         run: |
-          # Deadline from GitHub Classroom: Jan 25, 2026, 23:00 UTC
           DEADLINE="2026-01-25T23:00:00Z"
           DEADLINE_TIMESTAMP=$(date -d "$DEADLINE" +%s)
           CURRENT_TIMESTAMP=$(date +%s)
-          
-          # Calculate days remaining
           SECONDS_LEFT=$((DEADLINE_TIMESTAMP - CURRENT_TIMESTAMP))
           DAYS_LEFT=$((SECONDS_LEFT / 86400))
           
           echo "deadline=$DEADLINE" >> $GITHUB_OUTPUT
           echo "days_left=$DAYS_LEFT" >> $GITHUB_OUTPUT
+          echo "Days remaining: $DAYS_LEFT"
           
-          echo "⏰ Deadline: $DEADLINE"
-          echo "📅 Days remaining: $DAYS_LEFT"
-          
-          # Set reminder flags
           if [ $DAYS_LEFT -eq 5 ]; then
             echo "send_5day_reminder=true" >> $GITHUB_OUTPUT
           fi
@@ -52,38 +45,36 @@ jobs:
       - name: Send 5-day reminder
         if: steps.calculate.outputs.send_5day_reminder == 'true'
         run: |
-          # Check if reminder already sent
           EXISTING=$(gh issue list --search "5 Days Left" --state all --json number --jq '.[0].number')
           
           if [ -z "$EXISTING" ]; then
-            echo "📢 Sending 5-day reminder..."
+            cat > reminder.md << 'EOFREMINDER'
+          ## ⏰ Deadline Reminder
+          
+          Hi there! Just a friendly reminder about your coding test deadline.
+          
+          ### Timeline:
+          - **Deadline**: January 25, 2026 at 11:00 PM UTC
+          - **Time remaining**: 5 days
+          - **That's**: 120 hours from now
+          
+          ### Your Current Status:
+          Check your latest score in the [Actions tab](../../actions).
+          
+          ### What You Should Do:
+          - Push your latest code and check your score
+          - Aim for at least 30 points to pass
+          - Focus on requirements scoring 0 points
+          - Review MANUAL.md for instructions
+          
+          Good luck! 🚀
+          EOFREMINDER
             
-            gh issue create \
-              --title "⏰ Reminder: 5 Days Left!" \
-              --label "reminder" \
-              --body "## ⏰ Deadline Reminder
-
-Hi there! Just a friendly reminder about your coding test deadline.
-
-### Timeline:
-- **Deadline**: January 25, 2026 at 11:00 PM UTC
-- **Time remaining**: 5 days
-- **That's**: 120 hours from now
-
-### Your Current Status:
-Check your latest score in the [Actions tab](../../actions).
-
-### What You Should Do:
-- Push your latest code and check your score
-- Aim for at least 30 points to pass
-- Focus on requirements scoring 0 points
-- Review MANUAL.md for instructions
-
-Good luck! 🚀"
-            
+            gh issue create --title "⏰ Reminder: 5 Days Left!" --label "reminder" --body-file reminder.md
+            rm reminder.md
             echo "✅ Reminder sent!"
           else
-            echo "ℹ️ Reminder already sent (Issue #$EXISTING)"
+            echo "ℹ️ Reminder already sent"
           fi
         env:
           GH_TOKEN: ${{ github.token }}
@@ -94,33 +85,32 @@ Good luck! 🚀"
           EXISTING=$(gh issue list --search "2 Days Left" --state all --json number --jq '.[0].number')
           
           if [ -z "$EXISTING" ]; then
-            echo "📢 Sending 2-day reminder..."
+            cat > reminder.md << 'EOFREMINDER'
+          ## 🚨 Final Push Time!
+          
+          You have **2 days left** to complete your coding test.
+          
+          ### Deadline: January 25, 2026 at 11:00 PM UTC
+          
+          ### Quick Check:
+          Go to [Actions tab](../../actions) and check your score.
+          **Minimum to pass: 30 points**
+          
+          ### Priority Items:
+          - Personal answers (100+ words)
+          - FocusTimer component created
+          - Tests exist
+          - Countdown logic works
+          - Audio alert implemented
+          
+          You've got this! 💪
+          EOFREMINDER
             
-            gh issue create \
-              --title "🚨 URGENT: 2 Days Left!" \
-              --label "reminder,urgent" \
-              --body "## 🚨 Final Push Time!
-
-You have **2 days left** to complete your coding test.
-
-### Deadline: January 25, 2026 at 11:00 PM UTC
-
-### Quick Check:
-Go to [Actions tab](../../actions) and check your score.
-**Minimum to pass: 30 points**
-
-### Priority Items:
-- Personal answers (100+ words)
-- FocusTimer component created
-- Tests exist
-- Countdown logic works
-- Audio alert implemented
-
-You've got this! 💪"
-            
+            gh issue create --title "🚨 URGENT: 2 Days Left!" --label "reminder,urgent" --body-file reminder.md
+            rm reminder.md
             echo "✅ Urgent reminder sent!"
           else
-            echo "ℹ️ Reminder already sent (Issue #$EXISTING)"
+            echo "ℹ️ Reminder already sent"
           fi
         env:
           GH_TOKEN: ${{ github.token }}
@@ -131,27 +121,26 @@ You've got this! 💪"
           EXISTING=$(gh issue list --search "Today is the Deadline" --state all --json number --jq '.[0].number')
           
           if [ -z "$EXISTING" ]; then
-            echo "📢 Sending final reminder..."
+            cat > reminder.md << 'EOFREMINDER'
+          ## 🔴 Last Day to Submit!
+          
+          Today is your **final day** to complete the coding test.
+          
+          **Deadline: January 25, 2026 at 11:00 PM UTC**
+          
+          ### What to Do NOW:
+          1. Push your latest code
+          2. Check your score in [Actions](../../actions)
+          3. If below 30 points, fix the biggest issues first
+          
+          Good luck! 🚀
+          EOFREMINDER
             
-            gh issue create \
-              --title "🔴 TODAY IS THE DEADLINE!" \
-              --label "reminder,urgent" \
-              --body "## 🔴 Last Day to Submit!
-
-Today is your **final day** to complete the coding test.
-
-**Deadline: January 25, 2026 at 11:00 PM UTC**
-
-### What to Do NOW:
-1. Push your latest code
-2. Check your score in [Actions](../../actions)
-3. If below 30 points, fix the biggest issues first
-
-Good luck! 🚀"
-            
+            gh issue create --title "🔴 TODAY IS THE DEADLINE!" --label "reminder,urgent" --body-file reminder.md
+            rm reminder.md
             echo "✅ Final reminder sent!"
           else
-            echo "ℹ️ Reminder already sent (Issue #$EXISTING)"
+            echo "ℹ️ Reminder already sent"
           fi
         env:
           GH_TOKEN: ${{ github.token }}
