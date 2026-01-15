@@ -30,7 +30,7 @@ Please answer these 5 questions honestly. There are no minimum word requirements
 
 ## Question 4: Financial Goals
 
-**What will you do with the money you earn from this part-time job? What would earning $2/hour mean for you?**
+**What will you do with the money you earn from this part-time job? What would earning $2-$3/hour mean for you?**
 
 [Your answer here]
 
@@ -44,7 +44,23 @@ Please answer these 5 questions honestly. There are no minimum word requirements
 
 ---
 
-## Submission Checklist
+## Question 6: Age
+
+**How old are you?**
+
+[Your answer here]
+
+---
+
+## Question 7: Location
+
+**Where are you located in the Philippines exactly? Do you live with family or in a boarding house environment?**
+
+[Your answer here]
+
+
+
+Submission Checklist
 
 Before you start coding, make sure you've:
 - [ ] Read all 5 chapters of MANUAL.md
