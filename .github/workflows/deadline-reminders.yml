@@ -1,0 +1,197 @@
+name: Deadline Reminders
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC (4 AM EST / 1 AM PST)
+    - cron: '0 9 * * *'
+  workflow_dispatch:  # Allow manual trigger for testing
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Calculate days until deadline
+        id: calculate
+        run: |
+          # Deadline from GitHub Classroom: Jan 25, 2026, 23:00 UTC
+          DEADLINE="2026-01-25T23:00:00Z"
+          DEADLINE_TIMESTAMP=$(date -d "$DEADLINE" +%s)
+          CURRENT_TIMESTAMP=$(date +%s)
+          
+          # Calculate days remaining
+          SECONDS_LEFT=$((DEADLINE_TIMESTAMP - CURRENT_TIMESTAMP))
+          DAYS_LEFT=$((SECONDS_LEFT / 86400))
+          
+          echo "deadline=$DEADLINE" >> $GITHUB_OUTPUT
+          echo "days_left=$DAYS_LEFT" >> $GITHUB_OUTPUT
+          
+          echo "⏰ Deadline: $DEADLINE"
+          echo "📅 Days remaining: $DAYS_LEFT"
+          
+          # Set reminder flags
+          if [ $DAYS_LEFT -eq 5 ]; then
+            echo "send_5day_reminder=true" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ $DAYS_LEFT -eq 2 ]; then
+            echo "send_2day_reminder=true" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ $DAYS_LEFT -eq 0 ]; then
+            echo "send_final_reminder=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send 5-day reminder
+        if: steps.calculate.outputs.send_5day_reminder == 'true'
+        run: |
+          # Check if reminder already sent
+          EXISTING=$(gh issue list --search "5 Days Left" --state all --json number --jq '.[0].number')
+          
+          if [ -z "$EXISTING" ]; then
+            echo "📢 Sending 5-day reminder..."
+            
+            gh issue create \
+              --title "⏰ Reminder: 5 Days Left!" \
+              --label "reminder" \
+              --body "## ⏰ Deadline Reminder
+
+Hi there! Just a friendly reminder about your coding test deadline.
+
+### Timeline:
+- **Deadline**: January 25, 2026 at 11:00 PM UTC
+- **Time remaining**: 5 days
+- **That's**: 120 hours from now
+
+### Your Current Status:
+Check your latest score in the [Actions tab](../../actions) by:
+1. Click \"Actions\" at the top
+2. Find the latest \"Auto Grade Submission\" run
+3. Scroll to \"grade summary\" to see your score
+
+### What You Should Do:
+- [ ] Make sure you've pushed your latest code
+- [ ] Check your score (aim for at least 30 points to pass)
+- [ ] Focus on the requirements scoring 0 points
+- [ ] Test your timer component thoroughly
+- [ ] Answer all personal questions in CANDIDATE_ANSWERS.md
+
+### Need Help?
+- Review the MANUAL.md for step-by-step instructions
+- Email Dan if you're truly stuck
+- Remember: Using AI tools (ChatGPT, Claude) is allowed!
+
+Good luck! 🚀"
+            
+            echo "✅ Reminder sent!"
+          else
+            echo "ℹ️ Reminder already sent (Issue #$EXISTING)"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Send 2-day reminder
+        if: steps.calculate.outputs.send_2day_reminder == 'true'
+        run: |
+          # Check if reminder already sent
+          EXISTING=$(gh issue list --search "2 Days Left" --state all --json number --jq '.[0].number')
+          
+          if [ -z "$EXISTING" ]; then
+            echo "📢 Sending 2-day reminder..."
+            
+            gh issue create \
+              --title "🚨 URGENT: 2 Days Left!" \
+              --label "reminder,urgent" \
+              --body "## 🚨 Final Push Time!
+
+You have **2 days left** to complete your coding test.
+
+### Timeline:
+- **Deadline**: January 25, 2026 at 11:00 PM UTC
+- **Time remaining**: 48 hours
+- **That's**: 2 days from now
+
+### Quick Status Check:
+Go to [Actions tab](../../actions) and check your latest score.
+
+**Minimum to pass: 30 points**
+
+### If Your Score is Below 30:
+Look at the failed workflow run and check the \"Fail if score too low\" step - it will tell you **exactly** what's missing.
+
+### Priority Checklist:
+- [ ] Personal answers completed (100+ words)
+- [ ] FocusTimer component created and exports properly
+- [ ] Tests exist (FocusTimer.test.tsx)
+- [ ] Countdown logic works
+- [ ] Audio alert implemented
+- [ ] \"Dark One's Blessed Timer\" renamed to something professional
+
+### Final Tips:
+1. **Push early, push often** - see your score improve with each commit
+2. **Read error messages** - they tell you exactly what's wrong
+3. **Test locally first** - make sure \`npm run dev\` and \`npm test\` work
+4. **Don't overthink it** - the manual has everything you need
+
+You've got this! 💪"
+            
+            echo "✅ Urgent reminder sent!"
+          else
+            echo "ℹ️ Reminder already sent (Issue #$EXISTING)"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Send deadline day reminder
+        if: steps.calculate.outputs.send_final_reminder == 'true'
+        run: |
+          # Check if reminder already sent
+          EXISTING=$(gh issue list --search "Today is the Deadline" --state all --json number --jq '.[0].number')
+          
+          if [ -z "$EXISTING" ]; then
+            echo "📢 Sending final reminder..."
+            
+            gh issue create \
+              --title "🔴 TODAY IS THE DEADLINE!" \
+              --label "reminder,urgent" \
+              --body "## 🔴 Last Day to Submit!
+
+Today is your **final day** to complete the coding test.
+
+### Deadline:
+**January 25, 2026 at 11:00 PM UTC**
+
+That's **tonight**!
+
+### What to Do RIGHT NOW:
+1. Push your latest code
+2. Check your score in [Actions](../../actions)
+3. If below 30 points, focus on the biggest point items:
+   - Tests (10 points)
+   - Component (15 points)
+   - Countdown logic (20 points)
+
+### After Deadline:
+- Dan will review all submissions within 5-7 days
+- Top candidates will be contacted for next steps
+- You'll receive an email with feedback
+
+### Good Luck!
+Push that final commit and give it your best shot! 🚀
+
+---
+*This is an automated reminder. The deadline is enforced by GitHub Classroom.*"
+            
+            echo "✅ Final reminder sent!"
+          else
+            echo "ℹ️ Reminder already sent (Issue #$EXISTING)"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
