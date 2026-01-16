@@ -8,23 +8,37 @@ Some students who accepted the assignment early got an older version of the grad
 
 ## How to Fix It (Optional)
 
-### Option 1: Quick Fix (Just View Your Score)
+### Option 1: Quick Fix (Just View Your Score) ⭐ RECOMMENDED
 1. Go to the **Actions** tab in your repo
 2. Click on the most recent workflow run
 3. Scroll down to the **Summary** section
 4. **Your score is there!** Ignore the red error at the bottom.
 
-### Option 2: Update the Workflow (Remove the Error)
-If you want to remove the error completely:
+**That's it! You don't need to fix the workflow - your score is being calculated correctly.**
 
-1. In your repo, navigate to `.github/workflows/grade.yml`
-2. Click the **pencil icon** (Edit this file)
-3. Delete everything and paste the updated workflow from the template repo
-4. Or run this command in your local repo:
+---
+
+### Option 2: Update the Workflow (Remove the Error)
+If you really want to remove the cosmetic error:
+
+**Step 1:** Get the correct workflow file from the template repo
+
+**Step 2:** In your repo, navigate to `.github/workflows/auto-grade.yml`
+
+**Step 3:** Click the **pencil icon** (Edit this file)
+
+**Step 4:** Delete everything and paste the updated workflow from here:
+https://raw.githubusercontent.com/AppArara/task-timer-pwa-test-template/main/.github/workflows/auto-grade.yml
+
+**Step 5:** Commit the changes (button at bottom of page)
+
+---
+
+**OR** if you have the repo cloned locally, run this command:
 
 ```bash
-curl -o .github/workflows/grade.yml https://raw.githubusercontent.com/AppArara/focus-timer-test-template/main/.github/workflows/grade.yml
-git add .github/workflows/grade.yml
+curl -o .github/workflows/auto-grade.yml https://raw.githubusercontent.com/AppArara/task-timer-pwa-test-template/main/.github/workflows/auto-grade.yml
+git add .github/workflows/auto-grade.yml
 git commit -m "fix: Update grading workflow to remove 403 error"
 git push
 ```
@@ -36,7 +50,7 @@ GitHub Classroom creates a snapshot of the template when you accept. Later fixes
 The old workflow tried to post commit comments using `github-script`, but GitHub Classroom repos have restricted permissions (`contents: read` only). The new workflow uses GitHub Actions Summary instead, which doesn't need special permissions.
 
 ## Still Having Issues?
-Email Dan at: appararahq@gmail.com with:
+Email us at: appararahq@gmail.com with:
 - Your GitHub username
 - A link to your repo
 - Screenshot of the error
