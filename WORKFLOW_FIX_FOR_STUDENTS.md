@@ -36,7 +36,7 @@ GitHub Classroom creates a snapshot of the template when you accept. Later fixes
 The old workflow tried to post commit comments using `github-script`, but GitHub Classroom repos have restricted permissions (`contents: read` only). The new workflow uses GitHub Actions Summary instead, which doesn't need special permissions.
 
 ## Still Having Issues?
-Email Dan at: dan@edgerra.com with:
+Email Dan at: appararahq@gmail.com with:
 - Your GitHub username
 - A link to your repo
 - Screenshot of the error

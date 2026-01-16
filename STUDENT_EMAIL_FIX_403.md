@@ -30,7 +30,7 @@ Early students got an older version of the auto-grader before I fixed a permissi
 - ✅ The grading IS working
 - ❌ The error is cosmetic (happens after grading)
 - 🔧 You can fix it if you want (see guide above)
-- 📧 Email me if you need help: dan@edgerra.com
+- 📧 Email me if you need help: appararahq@gmail.com
 
 Keep coding! 🚀
 
