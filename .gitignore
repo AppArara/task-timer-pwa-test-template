@@ -34,8 +34,13 @@ coverage/
 
 # Personal/Private files (not for students)
 Junior_Dev.xlsx
+Junior_Dev.csv
 EMAIL_TEMPLATES.md
 GITHUB_CLASSROOM_SETUP.md
 INVITATION_EMAIL_FINAL.md
+send_emails.py
+credentials.py
+*.pyc
+__pycache__/
 
 # These are prep/admin files - students should NOT see them
